@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Zona Matemática - Números Enteros</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f8ff;
+    text-align: center;
+  }
+  .game {
+    background: white;
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #aaa;
+  }
+  button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    width: 80%;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .correct { color: green; font-weight: bold; }
+  .wrong { color: red; font-weight: bold; }
+  .timer { font-weight: bold; color: blue; }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+  <h2> Zona Matemática – Números Enteros</h2>
+  <p class="timer">Tiempo: <span id="time">60</span> segundos</p>
+
+  <h3 id="question"></h3>
+  <div id="options"></div>
+  <p id="message"></p>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "¿Qué son los números enteros?",
+    options: [
+      "Números con decimales",
+      "Números positivos, negativos y el cero",
+      "Solo números positivos",
+      "Solo números negativos"
+    ],
+    answer: 1
+  },
+  {
+    q: "¿Cuál de los siguientes es un número entero negativo?",
+    options: ["5", "0", "-3", "2.5"],
+    answer: 2
+  },
+  {
+    q: "¿Para qué se usan los números enteros?",
+    options: [
+      "Para medir longitudes",
+      "Para representar temperaturas y ganancias",
+      "Solo en geometría",
+      "Para fracciones"
+    ],
+    answer: 1
+  },
+  {
+    q: "¿Cuál es el resultado de −4 + 7?",
+    options: ["-11", "3", "-3", "11"],
+    answer: 1
+  },
+  {
+    q: "Si una temperatura baja de 2°C a −3°C, ¿qué tipo de número representa −3?",
+    options: [
+      "Entero positivo",
+      "Fracción",
+      "Entero negativo",
+      "Decimal"
+    ],
+    answer: 2
+  },
+  {
+    q: "¿Cuál es el conjunto correcto de números enteros?",
+    options: [
+      "{1/2, 2/3, 3/4}",
+      "{1, 2, 3}",
+      "{-2, -1, 0, 1, 2}",
+      "{0.5, 1.5, 2.5}"
+    ],
+    answer: 2
+  }
+];
+
+let current = 0;
+let correct = 0;
+let wrong = 0;
+let time = 60;
+let timer;
+
+function startTimer() {
+  time = 60;
+  document.getElementById("time").textContent = time;
+  timer = setInterval(() => {
+    time--;
+    document.getElementById("time").textContent = time;
+    if (time === 0) {
+      wrong++;
+      nextQuestion();
+    }
+  }, 1000);
+}
+
+function showQuestion() {
+  clearInterval(timer);
+  if (wrong >= 3) {
+    endGame(false);
+    return;
+  }
+  if (current >= questions.length) {
+    endGame(correct >= 4);
+    return;
+  }
+
+  startTimer();
+  document.getElementById("message").textContent = "";
+  document.getElementById("question").textContent = questions[current].q;
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  questions[current].options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(i);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(choice) {
+  clearInterval(timer);
+  if (choice === questions[current].answer) {
+    correct++;
+    document.getElementById("message").innerHTML =
+      "<span class='correct'>Excelente, eres muy inteligente</span>";
+    current++;
+    setTimeout(showQuestion, 1500);
+  } else {
+    wrong++;
+    document.getElementById("message").innerHTML =
+      "<span class='wrong'>Error, vuélvelo a intentar</span>";
+    if (wrong >= 3) {
+      setTimeout(() => endGame(false), 1500);
+    } else {
+      startTimer();
+    }
+  }
+}
+
+function endGame(win) {
+  clearInterval(timer);
+  document.querySelector(".game").innerHTML = `
+    <h2> Resumen de la partida</h2>
+    <p>✔️ Preguntas acertadas: <b>${correct}</b></p>
+    <p>❌ Preguntas equivocadas: <b>${wrong}</b></p>
+    <p>${win ? "🏅 ¡Ganaste la insignia!" : "💪 Tú puedes, tus conocimientos están allí"}</p>
+  `;
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
